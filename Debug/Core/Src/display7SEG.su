@@ -1,0 +1,5 @@
+display7SEG.c:9:6:display7SEG	32	static
+display7SEG.c:19:6:update7SEG	16	static
+display7SEG.c:87:6:updateLedBufferMode1	4	static
+display7SEG.c:96:6:updateLedBufferMode2	4	static
+display7SEG.c:105:6:updateLedBufferMode3	4	static
