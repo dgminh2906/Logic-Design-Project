@@ -59,6 +59,7 @@ static void MX_TIM2_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
 void blinkydot(){
 	HAL_GPIO_TogglePin(DOT_GPIO_Port, DOT_Pin);
 }
@@ -73,26 +74,42 @@ void update_time(){
 		min = 0;
 		hour += 1;
 	}
-	if (hour >= MAX_HOUR){
+	if (hour >= 24){
 		hour = 0;
 		day += 1;
 	}
+}
+
+void alarm(){
+	if (hour == hour_alarm && min == min_alarm && sec == sec_alarm){
+		HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_RESET);
+	}
+	if (isButtonPressed(2) == 1){
+		HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
+	}
+}
+
+void display5s(){
+	HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
 }
 
 void run(){
 	switch (status){
 		case INIT:
 			status = MODE1;
-			updateLedBufferMode1();
 			break;
 		case MODE1:
-			if (isButtonPressed(0) == 1){
-				status = MODE2;
-			}
 			updateLedBufferMode1();
+			if (isButtonPressed(0)) status = MODE2;
 			break;
 		case MODE2:
 			updateLedBufferMode2();
+			if (isButtonPressed(0)) status = MODE3;
+			break;
+		case MODE3:
+			updateLedBufferMode1();
+			if (isButtonPressed(1)) MAX_HOUR = 24;
+			else if (isButtonPressed(2)) MAX_HOUR = 12;
 			break;
 		default:
 			break;
@@ -137,11 +154,12 @@ int main(void)
   HAL_TIM_Base_Start_IT (& htim2);
   SCH_Init();
 
-  SCH_Add_Task(blinkydot, 10, 600);
-  SCH_Add_Task(update_time, 10, 1200);
-  SCH_Add_Task(scanLED, 10, 200);
-  SCH_Add_Task(run, 10, 10);
-
+  SCH_Add_Task(blinkydot, 10, 500);
+  SCH_Add_Task(update_time, 0, 1200);
+  SCH_Add_Task(scanLED, 0, 200);
+  SCH_Add_Task(run, 0, 10);
+  SCH_Add_Task(alarm, 10, 1200);
+  HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -278,7 +296,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pins : BUTTON1_Pin BUTTON2_Pin BUTTON3_Pin */
   GPIO_InitStruct.Pin = BUTTON1_Pin|BUTTON2_Pin|BUTTON3_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }

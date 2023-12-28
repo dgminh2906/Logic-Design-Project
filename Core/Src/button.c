@@ -4,6 +4,7 @@
  *  Created on: Dec 27, 2023
  *      Author: LENOVO
  */
+
 #include "button.h"
 
 int KeyReg0[NUM_OF_BUTTONS] = {NORMAL_STATE};

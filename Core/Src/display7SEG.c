@@ -85,8 +85,8 @@ void update7SEG(int index){
 }
 
 void updateLedBufferMode1(){
-	led_buffer[0] = hour / 10;
-	led_buffer[1] = hour % 10;
+	led_buffer[0] = (hour % MAX_HOUR) / 10;
+	led_buffer[1] = (hour % MAX_HOUR) % 10;
 	led_buffer[2] = min / 10;
 	led_buffer[3] = min % 10;
 	led_buffer[4] = sec / 10;
