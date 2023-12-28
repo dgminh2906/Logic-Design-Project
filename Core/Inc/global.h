@@ -8,6 +8,13 @@
 #ifndef INC_GLOBAL_H_
 #define INC_GLOBAL_H_
 
+#define INIT				0
+#define MODE1				1
+#define MODE2				2
+#define MODE3				3
+#define MODE4				4
+
+extern int status;
 extern int hour;
 extern int min;
 extern int sec;

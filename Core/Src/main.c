@@ -80,7 +80,26 @@ void update_time(){
 }
 
 void run(){
-	updateLedBufferMode1();
+	switch (status){
+		case INIT:
+			status = MODE1;
+			updateLedBufferMode1();
+			break;
+		case MODE1:
+			if (isButtonPressed(0) == 1){
+				status = MODE2;
+			}
+			updateLedBufferMode1();
+			break;
+		case MODE2:
+			updateLedBufferMode2();
+			break;
+		default:
+			break;
+	}
+}
+
+void scanLED(){
 	update7SEG(index_led);
 }
 /* USER CODE END 0 */
@@ -118,9 +137,11 @@ int main(void)
   HAL_TIM_Base_Start_IT (& htim2);
   SCH_Init();
 
-  SCH_Add_Task(blinkydot, 100, 600);
-  SCH_Add_Task(update_time, 100, 1200);
-  SCH_Add_Task(run, 100, 200);
+  SCH_Add_Task(blinkydot, 10, 600);
+  SCH_Add_Task(update_time, 10, 1200);
+  SCH_Add_Task(scanLED, 10, 200);
+  SCH_Add_Task(run, 10, 10);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
