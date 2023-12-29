@@ -60,7 +60,7 @@ static void MX_TIM2_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 void blinkydot(){
-	//Thiết lập cho đèn chớp tắt
+	//Set the DOT_LED toggle
 	HAL_GPIO_TogglePin(DOT_GPIO_Port, DOT_Pin);
 }
 
@@ -108,11 +108,11 @@ void update_time(){
 }
 
 void alarm(){
-	//So sánh điều kiện để báo thức xảy ra
+	//Compare the condition for the alarm mode
 	if (hour == hour_alarm && min == min_alarm && sec == sec_alarm){
 		HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_RESET);
 	}
-	//Thiết lập nút nhấn để tắt báo thức
+	//Button to turn off alarm
 	if (isButtonPressed(2) == 1){
 		HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
 	}
@@ -125,20 +125,20 @@ void fsm_run(){
 			break;
 		//MODE1
 		case MODE1:
-			//Thiết lập đèn hiển thị đang ở MODE1
+			//Set LED for being in MODE1
 			HAL_GPIO_WritePin(MODE1_GPIO_Port, MODE1_Pin, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(MODE5_GPIO_Port, MODE5_Pin, GPIO_PIN_SET);
-			//Cập nhật để LED hiển thị giờ ,phút, giây
+			//Update LED to display hour, minute, second
 			updateLedBufferMode1();
 			if (isButtonPressed(0)) status = MODE2;
 			if (isButtonPressed(1)) status = MODE5s;
 			break;
 		case MODE5s:
-			//Cập nhật để LED hiển thị ngày, tháng, năm
+			//Update LED to display day, month, year
 			updateLedBufferMode2();
 			if (isButtonPressed(0)) status = MODE2;
-			dmy5stime++; // Tăng biến đếm thời gian hiển thị MODE5s
-			//Nếu hiển thị đủ 5s, chuyển trạng thái về MODE1
+			dmy5stime++; //Increase the counter of MODE_5s
+			//If already displayed in 5s, return to MODE1
 			if (dmy5stime >= DMY_DISPLAY_TIME){
 				dmy5stime = 0;
 				status = MODE1;
@@ -146,7 +146,7 @@ void fsm_run(){
 			break;
 		//MODE2
 		case MODE2:
-			//Thiết lập đèn hiển thị đang ở MODE2
+			//Set LED for being in MODE2
 			HAL_GPIO_WritePin(MODE1_GPIO_Port, MODE1_Pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(MODE2_GPIO_Port, MODE2_Pin, GPIO_PIN_RESET);
 			updateLedBufferMode2();
@@ -154,10 +154,10 @@ void fsm_run(){
 			break;
 		//MODE3
 		case MODE3:
-			//Thiết lập đèn hiển thị đang ở MODE3
+			//Set LED for being in MODE3
 			HAL_GPIO_WritePin(MODE2_GPIO_Port, MODE2_Pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(MODE3_GPIO_Port, MODE3_Pin, GPIO_PIN_RESET);
-			//Cập nhật để LED hiển thị giờ, phút, giây
+			//Update LED to display hour, minute, second
 			updateLedBufferMode1();
 			if (isButtonPressed(0)) status = MODE4;
 			if (isButtonPressed(1)) MAX_HOUR = 24; //Chuyển sang hiển thị chế độ giờ 24
@@ -165,18 +165,18 @@ void fsm_run(){
 			break;
 		//MODE4
 		case MODE4:
-			//Thiết lập đèn hiển thị đang ở MODE4
+			//Set LED for being in MODE4
 			HAL_GPIO_WritePin(MODE3_GPIO_Port, MODE3_Pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(MODE4_GPIO_Port, MODE4_Pin, GPIO_PIN_RESET);
-			//Cập nhật để LED hiển thị giờ, phút, giây của báo thức
+			//Update LED to display hour, minute, second of the alarm
 			updateLedBufferMode4();
 			if (isButtonPressed(0)) status = MODE5;
-			if (isButtonPressed(1)) status = INC_HOUR; //Chuyển sang cập nhật giờ báo thức
+			if (isButtonPressed(1)) status = INC_HOUR; //Switch to set hour of the alarm
 			break;
 		//SET UP ALARM
 		case INC_HOUR:
-			if (isButtonPressed(1)) status = INC_MIN; //Chuyển sang cập nhật phút báo thức
-			//Tăng giờ báo thức lên 1 đơn vị
+			if (isButtonPressed(1)) status = INC_MIN; //Switch to set minute of the alarm
+			//Increase hour of the alarm (1 unit)
 			if (isButtonPressed(2)){
 				hour_alarm += 1;
 				if(hour_alarm >= MAX_HOUR) hour_alarm = 0;
@@ -185,8 +185,8 @@ void fsm_run(){
 			if (isButtonPressed(0)) status = MODE5;
 			break;
 		case INC_MIN:
-			if (isButtonPressed(1)) status = INC_SEC; //Chuyển sang cập nhật giây báo thức
-			//Tăng phút báo thức lên 1 đơn vị
+			if (isButtonPressed(1)) status = INC_SEC; //Switch to set second of the alarm
+			//Increase minute of the alarm (1 unit)
 			if (isButtonPressed(2)){
 				min_alarm += 1;
 				if(min_alarm >= 60) min_alarm = 0;
@@ -195,8 +195,8 @@ void fsm_run(){
 			if (isButtonPressed(0)) status = MODE5;
 			break;
 		case INC_SEC:
-			if (isButtonPressed(1)) status = INC_HOUR; //Chuyển sang cập nhật giờ báo thức
-			//Tăng giây báo thức lên 1 đơn vị
+			if (isButtonPressed(1)) status = INC_HOUR; //Switch to set hour of the alarm
+			//Increase second of the alarm (1 unit)
 			if (isButtonPressed(2)){
 				sec_alarm += 1;
 				if(sec_alarm >= 60) sec_alarm = 0;
@@ -206,24 +206,24 @@ void fsm_run(){
 			break;
 		//MODE5
 		case MODE5:
-			//Thiết lập đèn hiển thị đang ở MODE5
+			//Set LED for being in MODE5
 			HAL_GPIO_WritePin(MODE4_GPIO_Port, MODE4_Pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(MODE5_GPIO_Port, MODE5_Pin, GPIO_PIN_RESET);
-			//Cập nhật LED hiển thị giờ, phút, giây
+			//Update LED to display hour, minute, second
 			updateLedBufferMode1();
 			if (isButtonPressed(0)) status = MODE1;
-			if (isButtonPressed(1)) status = INC_MODE; //Chuyển sang chế độ tăng múi giờ
+			if (isButtonPressed(1)) status = INC_MODE; //Switch to increase time zone MODE
 			break;
 		//SET UP TIMEZONE
 		case INC_MODE:
 			if (isButtonPressed(0)) status = MODE1;
-			//Tăng múi giờ lên 1 đơn vị
+			//Increase time zone (1 unit)
 			if (isButtonPressed(1)){
 				hour += 1;
 				if (hour >= MAX_HOUR) hour = 0;
 				updateLedBufferMode1();
 			}
-			//Giảm múi giờ đi 1 đơn vị, chuyển sang chế độ giảm múi giờ
+			//Decrease time zone, switch to decrease time zone MODE
 			if (isButtonPressed(2)){
 				status = DEC_MODE;
 				hour -= 1;
@@ -233,14 +233,14 @@ void fsm_run(){
 			break;
 		case DEC_MODE:
 			if (isButtonPressed(0)) status = MODE1;
-			//Tăng múi giờ lên 1 đơn vị, chuyển sang chế độ tăng múi giờ
+			//Increase time zone, switch to increase time zone MODE
 			if (isButtonPressed(1)){
 				status = INC_MODE;
 				hour += 1;
 				if (hour >= MAX_HOUR) hour = 0;
 				updateLedBufferMode1();
 			}
-			//Giảm múi giờ đi 1 đơn vị
+			//Decrease time zone (1 unit)
 			if (isButtonPressed(2)){
 				hour -= 1;
 				if (hour < 0) hour = MAX_HOUR - 1;
@@ -253,7 +253,7 @@ void fsm_run(){
 }
 
 void scanLED(){
-	//Hiển thị led
+	//Display the LED
 	update7SEG(index_led);
 }
 /* USER CODE END 0 */
@@ -290,13 +290,13 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT (& htim2);
   SCH_Init();
-  //Thêm task vào scheduler
-  SCH_Add_Task(blinkydot, 10, 500); //Task nhấp nháy dấu 2 chấm
-  SCH_Add_Task(update_time, 0, 1200); // Task cập nhật thời gian
-  SCH_Add_Task(scanLED, 10, 200); //Task hiển thị LED
-  SCH_Add_Task(fsm_run, 0, 10); //Task chính
-  SCH_Add_Task(alarm, 10, 1200); //Task báo thức
-  //Thiết lập giá trị ban đầu của các LED
+  //Add Task to Scheduler
+  SCH_Add_Task(blinkydot, 10, 500); //Task for toggle 2 DOT_LEDs
+  SCH_Add_Task(update_time, 0, 1200); // Task for update time
+  SCH_Add_Task(scanLED, 20, 200); //Task for LEDs display
+  SCH_Add_Task(fsm_run, 0, 10); //Main task
+  SCH_Add_Task(alarm, 10, 1200); //Task for set up alarm
+  //Initialize
   HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(MODE1_GPIO_Port, MODE1_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(MODE2_GPIO_Port, MODE2_Pin, GPIO_PIN_SET);

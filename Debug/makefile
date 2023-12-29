@@ -64,8 +64,8 @@ all: main-build
 main-build: DATKLL231.elf secondary-outputs
 
 # Tool invocations
-DATKLL231.elf: $(OBJS) $(USER_OBJS) E:\STM32IDE\DATKLL231\STM32F103C6UX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "DATKLL231.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"E:\STM32IDE\DATKLL231\STM32F103C6UX_FLASH.ld" --specs=nosys.specs -Wl,-Map="DATKLL231.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+DATKLL231.elf: $(OBJS) $(USER_OBJS) F:\Courses_Materials\HK231\DATKLL\source\STM32F103C6UX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "DATKLL231.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"F:\Courses_Materials\HK231\DATKLL\source\STM32F103C6UX_FLASH.ld" --specs=nosys.specs -Wl,-Map="DATKLL231.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

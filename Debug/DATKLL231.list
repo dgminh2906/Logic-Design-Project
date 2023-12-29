@@ -37,13 +37,13 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  16 .debug_macro  000167be  00000000  00000000  0002bdf0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0000ace4  00000000  00000000  000425ae  2**0
+ 17 .debug_line   0000abac  00000000  00000000  000425ae  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0008239b  00000000  00000000  0004d292  2**0
+ 18 .debug_str    000823ae  00000000  00000000  0004d15a  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000053  00000000  00000000  000cf62d  2**0
+ 19 .comment      00000053  00000000  00000000  000cf508  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00002984  00000000  00000000  000cf680  2**2
+ 20 .debug_frame  00002984  00000000  00000000  000cf55c  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1630,7 +1630,7 @@ void updateLedBufferMode4(){
 void blinkydot(){
  8001014:	b580      	push	{r7, lr}
  8001016:	af00      	add	r7, sp, #0
-	//Thiết lập cho đèn chớp tắt
+	//Set the DOT_LED toggle
 	HAL_GPIO_TogglePin(DOT_GPIO_Port, DOT_Pin);
  8001018:	2110      	movs	r1, #16
  800101a:	4802      	ldr	r0, [pc, #8]	; (8001024 <blinkydot+0x10>)
@@ -1853,7 +1853,7 @@ void update_time(){
 void alarm(){
  8001190:	b580      	push	{r7, lr}
  8001192:	af00      	add	r7, sp, #0
-	//So sánh điều kiện để báo thức xảy ra
+	//Compare the condition for the alarm mode
 	if (hour == hour_alarm && min == min_alarm && sec == sec_alarm){
  8001194:	4b11      	ldr	r3, [pc, #68]	; (80011dc <alarm+0x4c>)
  8001196:	681a      	ldr	r2, [r3, #0]
@@ -1879,7 +1879,7 @@ void alarm(){
  80011bc:	480d      	ldr	r0, [pc, #52]	; (80011f4 <alarm+0x64>)
  80011be:	f001 f98c 	bl	80024da <HAL_GPIO_WritePin>
 	}
-	//Thiết lập nút nhấn để tắt báo thức
+	//Button to turn off alarm
 	if (isButtonPressed(2) == 1){
  80011c2:	2002      	movs	r0, #2
  80011c4:	f7ff fbba 	bl	800093c <isButtonPressed>
@@ -1977,7 +1977,7 @@ void fsm_run(){
  80012e6:	e1d6      	b.n	8001696 <fsm_run+0x49e>
 		//MODE1
 		case MODE1:
-			//Thiết lập đèn hiển thị đang ở MODE1
+			//Set LED for being in MODE1
 			HAL_GPIO_WritePin(MODE1_GPIO_Port, MODE1_Pin, GPIO_PIN_RESET);
  80012e8:	2200      	movs	r2, #0
  80012ea:	2180      	movs	r1, #128	; 0x80
@@ -1988,7 +1988,7 @@ void fsm_run(){
  80012f4:	f44f 6100 	mov.w	r1, #2048	; 0x800
  80012f8:	488b      	ldr	r0, [pc, #556]	; (8001528 <fsm_run+0x330>)
  80012fa:	f001 f8ee 	bl	80024da <HAL_GPIO_WritePin>
-			//Cập nhật để LED hiển thị giờ ,phút, giây
+			//Update LED to display hour, minute, second
 			updateLedBufferMode1();
  80012fe:	f7ff fd51 	bl	8000da4 <updateLedBufferMode1>
 			if (isButtonPressed(0)) status = MODE2;
@@ -2012,7 +2012,7 @@ void fsm_run(){
 			break;
  8001328:	e1a0      	b.n	800166c <fsm_run+0x474>
 		case MODE5s:
-			//Cập nhật để LED hiển thị ngày, tháng, năm
+			//Update LED to display day, month, year
 			updateLedBufferMode2();
  800132a:	f7ff fda7 	bl	8000e7c <updateLedBufferMode2>
 			if (isButtonPressed(0)) status = MODE2;
@@ -2024,13 +2024,13 @@ void fsm_run(){
  800133a:	4b7a      	ldr	r3, [pc, #488]	; (8001524 <fsm_run+0x32c>)
  800133c:	2202      	movs	r2, #2
  800133e:	601a      	str	r2, [r3, #0]
-			dmy5stime++; // Tăng biến đếm thời gian hiển thị MODE5s
+			dmy5stime++; //Increase the counter of MODE_5s
  8001340:	4b7a      	ldr	r3, [pc, #488]	; (800152c <fsm_run+0x334>)
  8001342:	681b      	ldr	r3, [r3, #0]
  8001344:	3301      	adds	r3, #1
  8001346:	4a79      	ldr	r2, [pc, #484]	; (800152c <fsm_run+0x334>)
  8001348:	6013      	str	r3, [r2, #0]
-			//Nếu hiển thị đủ 5s, chuyển trạng thái về MODE1
+			//If already displayed in 5s, return to MODE1
 			if (dmy5stime >= DMY_DISPLAY_TIME){
  800134a:	4b78      	ldr	r3, [pc, #480]	; (800152c <fsm_run+0x334>)
  800134c:	681b      	ldr	r3, [r3, #0]
@@ -2049,7 +2049,7 @@ void fsm_run(){
  8001362:	e185      	b.n	8001670 <fsm_run+0x478>
 		//MODE2
 		case MODE2:
-			//Thiết lập đèn hiển thị đang ở MODE2
+			//Set LED for being in MODE2
 			HAL_GPIO_WritePin(MODE1_GPIO_Port, MODE1_Pin, GPIO_PIN_SET);
  8001364:	2201      	movs	r2, #1
  8001366:	2180      	movs	r1, #128	; 0x80
@@ -2075,7 +2075,7 @@ void fsm_run(){
  8001392:	e16f      	b.n	8001674 <fsm_run+0x47c>
 		//MODE3
 		case MODE3:
-			//Thiết lập đèn hiển thị đang ở MODE3
+			//Set LED for being in MODE3
 			HAL_GPIO_WritePin(MODE2_GPIO_Port, MODE2_Pin, GPIO_PIN_SET);
  8001394:	2201      	movs	r2, #1
  8001396:	f44f 7180 	mov.w	r1, #256	; 0x100
@@ -2086,7 +2086,7 @@ void fsm_run(){
  80013a2:	f44f 7100 	mov.w	r1, #512	; 0x200
  80013a6:	4860      	ldr	r0, [pc, #384]	; (8001528 <fsm_run+0x330>)
  80013a8:	f001 f897 	bl	80024da <HAL_GPIO_WritePin>
-			//Cập nhật để LED hiển thị giờ, phút, giây
+			//Update LED to display hour, minute, second
 			updateLedBufferMode1();
  80013ac:	f7ff fcfa 	bl	8000da4 <updateLedBufferMode1>
 			if (isButtonPressed(0)) status = MODE4;
@@ -2120,7 +2120,7 @@ void fsm_run(){
  80013e8:	e146      	b.n	8001678 <fsm_run+0x480>
 		//MODE4
 		case MODE4:
-			//Thiết lập đèn hiển thị đang ở MODE4
+			//Set LED for being in MODE4
 			HAL_GPIO_WritePin(MODE3_GPIO_Port, MODE3_Pin, GPIO_PIN_SET);
  80013ea:	2201      	movs	r2, #1
  80013ec:	f44f 7100 	mov.w	r1, #512	; 0x200
@@ -2131,7 +2131,7 @@ void fsm_run(){
  80013f8:	f44f 6180 	mov.w	r1, #1024	; 0x400
  80013fc:	484a      	ldr	r0, [pc, #296]	; (8001528 <fsm_run+0x330>)
  80013fe:	f001 f86c 	bl	80024da <HAL_GPIO_WritePin>
-			//Cập nhật để LED hiển thị giờ, phút, giây của báo thức
+			//Update LED to display hour, minute, second of the alarm
 			updateLedBufferMode4();
  8001402:	f7ff fd9b 	bl	8000f3c <updateLedBufferMode4>
 			if (isButtonPressed(0)) status = MODE5;
@@ -2143,7 +2143,7 @@ void fsm_run(){
  8001412:	4b44      	ldr	r3, [pc, #272]	; (8001524 <fsm_run+0x32c>)
  8001414:	2205      	movs	r2, #5
  8001416:	601a      	str	r2, [r3, #0]
-			if (isButtonPressed(1)) status = INC_HOUR; //Chuyển sang cập nhật giờ báo thức
+			if (isButtonPressed(1)) status = INC_HOUR; //Switch to set hour of the alarm
  8001418:	2001      	movs	r0, #1
  800141a:	f7ff fa8f 	bl	800093c <isButtonPressed>
  800141e:	4603      	mov	r3, r0
@@ -2156,7 +2156,7 @@ void fsm_run(){
  800142c:	e126      	b.n	800167c <fsm_run+0x484>
 		//SET UP ALARM
 		case INC_HOUR:
-			if (isButtonPressed(1)) status = INC_MIN; //Chuyển sang cập nhật phút báo thức
+			if (isButtonPressed(1)) status = INC_MIN; //Switch to set minute of the alarm
  800142e:	2001      	movs	r0, #1
  8001430:	f7ff fa84 	bl	800093c <isButtonPressed>
  8001434:	4603      	mov	r3, r0
@@ -2165,7 +2165,7 @@ void fsm_run(){
  800143a:	4b3a      	ldr	r3, [pc, #232]	; (8001524 <fsm_run+0x32c>)
  800143c:	222a      	movs	r2, #42	; 0x2a
  800143e:	601a      	str	r2, [r3, #0]
-			//Tăng giờ báo thức lên 1 đơn vị
+			//Increase hour of the alarm (1 unit)
 			if (isButtonPressed(2)){
  8001440:	2002      	movs	r0, #2
  8001442:	f7ff fa7b 	bl	800093c <isButtonPressed>
@@ -2203,7 +2203,7 @@ void fsm_run(){
 			break;
  8001480:	e0fe      	b.n	8001680 <fsm_run+0x488>
 		case INC_MIN:
-			if (isButtonPressed(1)) status = INC_SEC; //Chuyển sang cập nhật giây báo thức
+			if (isButtonPressed(1)) status = INC_SEC; //Switch to set second of the alarm
  8001482:	2001      	movs	r0, #1
  8001484:	f7ff fa5a 	bl	800093c <isButtonPressed>
  8001488:	4603      	mov	r3, r0
@@ -2212,7 +2212,7 @@ void fsm_run(){
  800148e:	4b25      	ldr	r3, [pc, #148]	; (8001524 <fsm_run+0x32c>)
  8001490:	222b      	movs	r2, #43	; 0x2b
  8001492:	601a      	str	r2, [r3, #0]
-			//Tăng phút báo thức lên 1 đơn vị
+			//Increase minute of the alarm (1 unit)
 			if (isButtonPressed(2)){
  8001494:	2002      	movs	r0, #2
  8001496:	f7ff fa51 	bl	800093c <isButtonPressed>
@@ -2248,7 +2248,7 @@ void fsm_run(){
 			break;
  80014d0:	e0d8      	b.n	8001684 <fsm_run+0x48c>
 		case INC_SEC:
-			if (isButtonPressed(1)) status = INC_HOUR; //Chuyển sang cập nhật giờ báo thức
+			if (isButtonPressed(1)) status = INC_HOUR; //Switch to set hour of the alarm
  80014d2:	2001      	movs	r0, #1
  80014d4:	f7ff fa32 	bl	800093c <isButtonPressed>
  80014d8:	4603      	mov	r3, r0
@@ -2257,7 +2257,7 @@ void fsm_run(){
  80014de:	4b11      	ldr	r3, [pc, #68]	; (8001524 <fsm_run+0x32c>)
  80014e0:	2229      	movs	r2, #41	; 0x29
  80014e2:	601a      	str	r2, [r3, #0]
-			//Tăng giây báo thức lên 1 đơn vị
+			//Increase second of the alarm (1 unit)
 			if (isButtonPressed(2)){
  80014e4:	2002      	movs	r0, #2
  80014e6:	f7ff fa29 	bl	800093c <isButtonPressed>
@@ -2302,7 +2302,7 @@ void fsm_run(){
  800153c:	20000040 	.word	0x20000040
 		//MODE5
 		case MODE5:
-			//Thiết lập đèn hiển thị đang ở MODE5
+			//Set LED for being in MODE5
 			HAL_GPIO_WritePin(MODE4_GPIO_Port, MODE4_Pin, GPIO_PIN_SET);
  8001540:	2201      	movs	r2, #1
  8001542:	f44f 6180 	mov.w	r1, #1024	; 0x400
@@ -2313,7 +2313,7 @@ void fsm_run(){
  800154e:	f44f 6100 	mov.w	r1, #2048	; 0x800
  8001552:	4852      	ldr	r0, [pc, #328]	; (800169c <fsm_run+0x4a4>)
  8001554:	f000 ffc1 	bl	80024da <HAL_GPIO_WritePin>
-			//Cập nhật LED hiển thị giờ, phút, giây
+			//Update LED to display hour, minute, second
 			updateLedBufferMode1();
  8001558:	f7ff fc24 	bl	8000da4 <updateLedBufferMode1>
 			if (isButtonPressed(0)) status = MODE1;
@@ -2325,7 +2325,7 @@ void fsm_run(){
  8001568:	4b4d      	ldr	r3, [pc, #308]	; (80016a0 <fsm_run+0x4a8>)
  800156a:	2201      	movs	r2, #1
  800156c:	601a      	str	r2, [r3, #0]
-			if (isButtonPressed(1)) status = INC_MODE; //Chuyển sang chế độ tăng múi giờ
+			if (isButtonPressed(1)) status = INC_MODE; //Switch to increase time zone MODE
  800156e:	2001      	movs	r0, #1
  8001570:	f7ff f9e4 	bl	800093c <isButtonPressed>
  8001574:	4603      	mov	r3, r0
@@ -2347,7 +2347,7 @@ void fsm_run(){
  8001590:	4b43      	ldr	r3, [pc, #268]	; (80016a0 <fsm_run+0x4a8>)
  8001592:	2201      	movs	r2, #1
  8001594:	601a      	str	r2, [r3, #0]
-			//Tăng múi giờ lên 1 đơn vị
+			//Increase time zone (1 unit)
 			if (isButtonPressed(1)){
  8001596:	2001      	movs	r0, #1
  8001598:	f7ff f9d0 	bl	800093c <isButtonPressed>
@@ -2373,7 +2373,7 @@ void fsm_run(){
 				updateLedBufferMode1();
  80015be:	f7ff fbf1 	bl	8000da4 <updateLedBufferMode1>
 			}
-			//Giảm múi giờ đi 1 đơn vị, chuyển sang chế độ giảm múi giờ
+			//Decrease time zone, switch to decrease time zone MODE
 			if (isButtonPressed(2)){
  80015c2:	2002      	movs	r0, #2
  80015c4:	f7ff f9ba 	bl	800093c <isButtonPressed>
@@ -2415,7 +2415,7 @@ void fsm_run(){
  8001602:	4b27      	ldr	r3, [pc, #156]	; (80016a0 <fsm_run+0x4a8>)
  8001604:	2201      	movs	r2, #1
  8001606:	601a      	str	r2, [r3, #0]
-			//Tăng múi giờ lên 1 đơn vị, chuyển sang chế độ tăng múi giờ
+			//Increase time zone, switch to increase time zone MODE
 			if (isButtonPressed(1)){
  8001608:	2001      	movs	r0, #1
  800160a:	f7ff f997 	bl	800093c <isButtonPressed>
@@ -2445,7 +2445,7 @@ void fsm_run(){
 				updateLedBufferMode1();
  8001636:	f7ff fbb5 	bl	8000da4 <updateLedBufferMode1>
 			}
-			//Giảm múi giờ đi 1 đơn vị
+			//Decrease time zone (1 unit)
 			if (isButtonPressed(2)){
  800163a:	2002      	movs	r0, #2
  800163c:	f7ff f97e 	bl	800093c <isButtonPressed>
@@ -2524,7 +2524,7 @@ void fsm_run(){
 void scanLED(){
  80016ac:	b580      	push	{r7, lr}
  80016ae:	af00      	add	r7, sp, #0
-	//Hiển thị led
+	//Display the LED
 	update7SEG(index_led);
  80016b0:	4b03      	ldr	r3, [pc, #12]	; (80016c0 <scanLED+0x14>)
  80016b2:	681b      	ldr	r3, [r3, #0]
@@ -2574,33 +2574,33 @@ int main(void)
  80016da:	f001 fb5b 	bl	8002d94 <HAL_TIM_Base_Start_IT>
   SCH_Init();
  80016de:	f000 f991 	bl	8001a04 <SCH_Init>
-  //Thêm task vào scheduler
-  SCH_Add_Task(blinkydot, 10, 500); //Task nhấp nháy dấu 2 chấm
+  //Add Task to Scheduler
+  SCH_Add_Task(blinkydot, 10, 500); //Task for toggle 2 DOT_LEDs
  80016e2:	f44f 72fa 	mov.w	r2, #500	; 0x1f4
  80016e6:	210a      	movs	r1, #10
  80016e8:	481f      	ldr	r0, [pc, #124]	; (8001768 <main+0xa4>)
  80016ea:	f000 fa4f 	bl	8001b8c <SCH_Add_Task>
-  SCH_Add_Task(update_time, 0, 1200); // Task cập nhật thời gian
+  SCH_Add_Task(update_time, 0, 1200); // Task for update time
  80016ee:	f44f 6296 	mov.w	r2, #1200	; 0x4b0
  80016f2:	2100      	movs	r1, #0
  80016f4:	481d      	ldr	r0, [pc, #116]	; (800176c <main+0xa8>)
  80016f6:	f000 fa49 	bl	8001b8c <SCH_Add_Task>
-  SCH_Add_Task(scanLED, 10, 200); //Task hiển thị LED
+  SCH_Add_Task(scanLED, 20, 200); //Task for LEDs display
  80016fa:	22c8      	movs	r2, #200	; 0xc8
- 80016fc:	210a      	movs	r1, #10
+ 80016fc:	2114      	movs	r1, #20
  80016fe:	481c      	ldr	r0, [pc, #112]	; (8001770 <main+0xac>)
  8001700:	f000 fa44 	bl	8001b8c <SCH_Add_Task>
-  SCH_Add_Task(fsm_run, 0, 10); //Task chính
+  SCH_Add_Task(fsm_run, 0, 10); //Main task
  8001704:	220a      	movs	r2, #10
  8001706:	2100      	movs	r1, #0
  8001708:	481a      	ldr	r0, [pc, #104]	; (8001774 <main+0xb0>)
  800170a:	f000 fa3f 	bl	8001b8c <SCH_Add_Task>
-  SCH_Add_Task(alarm, 10, 1200); //Task báo thức
+  SCH_Add_Task(alarm, 10, 1200); //Task for set up alarm
  800170e:	f44f 6296 	mov.w	r2, #1200	; 0x4b0
  8001712:	210a      	movs	r1, #10
  8001714:	4818      	ldr	r0, [pc, #96]	; (8001778 <main+0xb4>)
  8001716:	f000 fa39 	bl	8001b8c <SCH_Add_Task>
-  //Thiết lập giá trị ban đầu của các LED
+  //Initialize
   HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
  800171a:	2201      	movs	r2, #1
  800171c:	2120      	movs	r1, #32
