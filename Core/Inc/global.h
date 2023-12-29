@@ -13,6 +13,14 @@
 #define MODE2				2
 #define MODE3				3
 #define MODE4				4
+#define MODE5 				5
+
+#define INC_HOUR			41
+#define INC_MIN				42
+#define INC_SEC				43
+
+#define INC_MODE			51
+#define DEC_MODE			52
 
 extern int status;
 extern int hour;

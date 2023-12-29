@@ -93,23 +93,96 @@ void display5s(){
 	HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
 }
 
-void run(){
+void fsm_run(){
 	switch (status){
 		case INIT:
 			status = MODE1;
 			break;
+		//MODE1
 		case MODE1:
 			updateLedBufferMode1();
 			if (isButtonPressed(0)) status = MODE2;
 			break;
+		//MODE2
 		case MODE2:
 			updateLedBufferMode2();
 			if (isButtonPressed(0)) status = MODE3;
 			break;
+		//MODE3
 		case MODE3:
 			updateLedBufferMode1();
+			if (isButtonPressed(0)) status = MODE4;
 			if (isButtonPressed(1)) MAX_HOUR = 24;
-			else if (isButtonPressed(2)) MAX_HOUR = 12;
+			if (isButtonPressed(2)) MAX_HOUR = 12;
+			break;
+		//MODE4
+		case MODE4:
+			updateLedBufferMode4();
+			if (isButtonPressed(0)) status = MODE5;
+			if (isButtonPressed(1)) status = INC_HOUR;
+			break;
+		//SET UP ALARM
+		case INC_HOUR:
+			if (isButtonPressed(1)) status = INC_MIN;
+			if (isButtonPressed(2)){
+				hour_alarm += 1;
+				if(hour_alarm >= MAX_HOUR) hour_alarm = 0;
+				updateLedBufferMode4();
+			}
+			if (isButtonPressed(0)) status = MODE5;
+			break;
+		case INC_MIN:
+			if (isButtonPressed(1)) status = INC_SEC;
+			if (isButtonPressed(2)){
+				min_alarm += 1;
+				if(min_alarm >= 60) min_alarm = 0;
+				updateLedBufferMode4();
+			}
+			if (isButtonPressed(0)) status = MODE5;
+			break;
+		case INC_SEC:
+			if (isButtonPressed(1)) status = INC_HOUR;
+			if (isButtonPressed(2)){
+				sec_alarm += 1;
+				if(sec_alarm >= 60) sec_alarm = 0;
+				updateLedBufferMode4();
+			}
+			if (isButtonPressed(0)) status = MODE5;
+			break;
+		//MODE5
+		case MODE5:
+			updateLedBufferMode1();
+			if (isButtonPressed(0)) status = MODE1;
+			if (isButtonPressed(1)) status = INC_MODE;
+			break;
+		//SET UP TIMEZONE
+		case INC_MODE:
+			if (isButtonPressed(0)) status = MODE1;
+			if (isButtonPressed(1)){
+				hour += 1;
+				if (hour >= MAX_HOUR) hour = 0;
+				updateLedBufferMode1();
+			}
+			if (isButtonPressed(2)){
+				status = DEC_MODE;
+				hour -= 1;
+				if (hour < 0) hour = MAX_HOUR - 1;
+				updateLedBufferMode1();
+			}
+			break;
+		case DEC_MODE:
+			if (isButtonPressed(0)) status = MODE1;
+			if (isButtonPressed(1)){
+				status = INC_MODE;
+				hour += 1;
+				if (hour >= MAX_HOUR) hour = 0;
+				updateLedBufferMode1();
+			}
+			if (isButtonPressed(2)){
+				hour -= 1;
+				if (hour < 0) hour = MAX_HOUR - 1;
+				updateLedBufferMode1();
+			}
 			break;
 		default:
 			break;
@@ -157,7 +230,7 @@ int main(void)
   SCH_Add_Task(blinkydot, 10, 500);
   SCH_Add_Task(update_time, 0, 1200);
   SCH_Add_Task(scanLED, 0, 200);
-  SCH_Add_Task(run, 0, 10);
+  SCH_Add_Task(fsm_run, 0, 10);
   SCH_Add_Task(alarm, 10, 1200);
   HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
   /* USER CODE END 2 */

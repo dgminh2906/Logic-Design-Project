@@ -18,6 +18,6 @@ void update7SEG(int index);
 
 void updateLedBufferMode1();
 void updateLedBufferMode2();
-void updateLedBufferMode3();
+void updateLedBufferMode4();
 
 #endif /* INC_DISPLAY7SEG_H_ */

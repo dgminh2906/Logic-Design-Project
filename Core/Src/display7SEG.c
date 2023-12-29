@@ -102,8 +102,13 @@ void updateLedBufferMode2(){
 	led_buffer[5] = (year - 2000) % 10;
 }
 
-void updateLedBufferMode3(){
-
+void updateLedBufferMode4(){
+	led_buffer[0] = (hour_alarm % MAX_HOUR) / 10;
+	led_buffer[1] = (hour_alarm % MAX_HOUR) % 10;
+	led_buffer[2] = min_alarm / 10;
+	led_buffer[3] = min_alarm % 10;
+	led_buffer[4] = sec_alarm / 10;
+	led_buffer[5] = sec_alarm % 10;
 }
 
 
