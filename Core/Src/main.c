@@ -109,10 +109,11 @@ void update_time(){
 
 void alarm(){
 	//Compare the condition for the alarm mode
-	if (hour == hour_alarm && min == min_alarm && sec == sec_alarm){
+	if (hour == hour_alarm && min == min_alarm && ((sec - sec_alarm) >=0  && (sec - sec_alarm) < 11)){
 		HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_RESET);
 	}
-	//Button to turn off alarm
+	else HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
+	//Set button to turn off alarm
 	if (isButtonPressed(2) == 1){
 		HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
 	}
