@@ -59,8 +59,8 @@ static void MX_TIM2_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
 void blinkydot(){
+	//Thiết lập cho đèn chớp tắt
 	HAL_GPIO_TogglePin(DOT_GPIO_Port, DOT_Pin);
 }
 
@@ -77,20 +77,45 @@ void update_time(){
 	if (hour >= 24){
 		hour = 0;
 		day += 1;
+		if (day > 31){
+			day = 1;
+			month += 1;
+			if (month > 12) {
+				month = 1;
+				year += 1;
+			}
+		}
+		else if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
+			day = 1;
+			month += 1;
+		}
+		else if (month == 2) {
+			// Check for leap year
+			if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) {
+				if (day > 29) {
+					day = 1;
+					month += 1;
+				}
+			}
+			else {
+				if (day > 28) {
+					day = 1;
+					month += 1;
+				}
+			}
+		}
 	}
 }
 
 void alarm(){
+	//So sánh điều kiện để báo thức xảy ra
 	if (hour == hour_alarm && min == min_alarm && sec == sec_alarm){
 		HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_RESET);
 	}
+	//Thiết lập nút nhấn để tắt báo thức
 	if (isButtonPressed(2) == 1){
 		HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
 	}
-}
-
-void display5s(){
-	HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
 }
 
 void fsm_run(){
@@ -100,30 +125,58 @@ void fsm_run(){
 			break;
 		//MODE1
 		case MODE1:
+			//Thiết lập đèn hiển thị đang ở MODE1
+			HAL_GPIO_WritePin(MODE1_GPIO_Port, MODE1_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(MODE5_GPIO_Port, MODE5_Pin, GPIO_PIN_SET);
+			//Cập nhật để LED hiển thị giờ ,phút, giây
 			updateLedBufferMode1();
 			if (isButtonPressed(0)) status = MODE2;
+			if (isButtonPressed(1)) status = MODE5s;
+			break;
+		case MODE5s:
+			//Cập nhật để LED hiển thị ngày, tháng, năm
+			updateLedBufferMode2();
+			if (isButtonPressed(0)) status = MODE2;
+			dmy5stime++; // Tăng biến đếm thời gian hiển thị MODE5s
+			//Nếu hiển thị đủ 5s, chuyển trạng thái về MODE1
+			if (dmy5stime >= DMY_DISPLAY_TIME){
+				dmy5stime = 0;
+				status = MODE1;
+			}
 			break;
 		//MODE2
 		case MODE2:
+			//Thiết lập đèn hiển thị đang ở MODE2
+			HAL_GPIO_WritePin(MODE1_GPIO_Port, MODE1_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(MODE2_GPIO_Port, MODE2_Pin, GPIO_PIN_RESET);
 			updateLedBufferMode2();
 			if (isButtonPressed(0)) status = MODE3;
 			break;
 		//MODE3
 		case MODE3:
+			//Thiết lập đèn hiển thị đang ở MODE3
+			HAL_GPIO_WritePin(MODE2_GPIO_Port, MODE2_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(MODE3_GPIO_Port, MODE3_Pin, GPIO_PIN_RESET);
+			//Cập nhật để LED hiển thị giờ, phút, giây
 			updateLedBufferMode1();
 			if (isButtonPressed(0)) status = MODE4;
-			if (isButtonPressed(1)) MAX_HOUR = 24;
-			if (isButtonPressed(2)) MAX_HOUR = 12;
+			if (isButtonPressed(1)) MAX_HOUR = 24; //Chuyển sang hiển thị chế độ giờ 24
+			if (isButtonPressed(2)) MAX_HOUR = 12; //Chuyển sang hiển thị chế độ giờ 12
 			break;
 		//MODE4
 		case MODE4:
+			//Thiết lập đèn hiển thị đang ở MODE4
+			HAL_GPIO_WritePin(MODE3_GPIO_Port, MODE3_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(MODE4_GPIO_Port, MODE4_Pin, GPIO_PIN_RESET);
+			//Cập nhật để LED hiển thị giờ, phút, giây của báo thức
 			updateLedBufferMode4();
 			if (isButtonPressed(0)) status = MODE5;
-			if (isButtonPressed(1)) status = INC_HOUR;
+			if (isButtonPressed(1)) status = INC_HOUR; //Chuyển sang cập nhật giờ báo thức
 			break;
 		//SET UP ALARM
 		case INC_HOUR:
-			if (isButtonPressed(1)) status = INC_MIN;
+			if (isButtonPressed(1)) status = INC_MIN; //Chuyển sang cập nhật phút báo thức
+			//Tăng giờ báo thức lên 1 đơn vị
 			if (isButtonPressed(2)){
 				hour_alarm += 1;
 				if(hour_alarm >= MAX_HOUR) hour_alarm = 0;
@@ -132,7 +185,8 @@ void fsm_run(){
 			if (isButtonPressed(0)) status = MODE5;
 			break;
 		case INC_MIN:
-			if (isButtonPressed(1)) status = INC_SEC;
+			if (isButtonPressed(1)) status = INC_SEC; //Chuyển sang cập nhật giây báo thức
+			//Tăng phút báo thức lên 1 đơn vị
 			if (isButtonPressed(2)){
 				min_alarm += 1;
 				if(min_alarm >= 60) min_alarm = 0;
@@ -141,7 +195,8 @@ void fsm_run(){
 			if (isButtonPressed(0)) status = MODE5;
 			break;
 		case INC_SEC:
-			if (isButtonPressed(1)) status = INC_HOUR;
+			if (isButtonPressed(1)) status = INC_HOUR; //Chuyển sang cập nhật giờ báo thức
+			//Tăng giây báo thức lên 1 đơn vị
 			if (isButtonPressed(2)){
 				sec_alarm += 1;
 				if(sec_alarm >= 60) sec_alarm = 0;
@@ -151,18 +206,24 @@ void fsm_run(){
 			break;
 		//MODE5
 		case MODE5:
+			//Thiết lập đèn hiển thị đang ở MODE5
+			HAL_GPIO_WritePin(MODE4_GPIO_Port, MODE4_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(MODE5_GPIO_Port, MODE5_Pin, GPIO_PIN_RESET);
+			//Cập nhật LED hiển thị giờ, phút, giây
 			updateLedBufferMode1();
 			if (isButtonPressed(0)) status = MODE1;
-			if (isButtonPressed(1)) status = INC_MODE;
+			if (isButtonPressed(1)) status = INC_MODE; //Chuyển sang chế độ tăng múi giờ
 			break;
 		//SET UP TIMEZONE
 		case INC_MODE:
 			if (isButtonPressed(0)) status = MODE1;
+			//Tăng múi giờ lên 1 đơn vị
 			if (isButtonPressed(1)){
 				hour += 1;
 				if (hour >= MAX_HOUR) hour = 0;
 				updateLedBufferMode1();
 			}
+			//Giảm múi giờ đi 1 đơn vị, chuyển sang chế độ giảm múi giờ
 			if (isButtonPressed(2)){
 				status = DEC_MODE;
 				hour -= 1;
@@ -172,12 +233,14 @@ void fsm_run(){
 			break;
 		case DEC_MODE:
 			if (isButtonPressed(0)) status = MODE1;
+			//Tăng múi giờ lên 1 đơn vị, chuyển sang chế độ tăng múi giờ
 			if (isButtonPressed(1)){
 				status = INC_MODE;
 				hour += 1;
 				if (hour >= MAX_HOUR) hour = 0;
 				updateLedBufferMode1();
 			}
+			//Giảm múi giờ đi 1 đơn vị
 			if (isButtonPressed(2)){
 				hour -= 1;
 				if (hour < 0) hour = MAX_HOUR - 1;
@@ -190,6 +253,7 @@ void fsm_run(){
 }
 
 void scanLED(){
+	//Hiển thị led
 	update7SEG(index_led);
 }
 /* USER CODE END 0 */
@@ -226,13 +290,20 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT (& htim2);
   SCH_Init();
-
-  SCH_Add_Task(blinkydot, 10, 500);
-  SCH_Add_Task(update_time, 0, 1200);
-  SCH_Add_Task(scanLED, 10, 200);
-  SCH_Add_Task(fsm_run, 0, 10);
-  SCH_Add_Task(alarm, 10, 1200);
+  //Thêm task vào scheduler
+  SCH_Add_Task(blinkydot, 10, 500); //Task nhấp nháy dấu 2 chấm
+  SCH_Add_Task(update_time, 0, 1200); // Task cập nhật thời gian
+  SCH_Add_Task(scanLED, 10, 200); //Task hiển thị LED
+  SCH_Add_Task(fsm_run, 0, 10); //Task chính
+  SCH_Add_Task(alarm, 10, 1200); //Task báo thức
+  //Thiết lập giá trị ban đầu của các LED
   HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(MODE1_GPIO_Port, MODE1_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(MODE2_GPIO_Port, MODE2_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(MODE3_GPIO_Port, MODE3_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(MODE4_GPIO_Port, MODE4_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(MODE5_GPIO_Port, MODE5_Pin, GPIO_PIN_SET);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -345,8 +416,9 @@ static void MX_GPIO_Init(void)
                           |EN2_Pin|EN3_Pin|EN4_Pin|EN5_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, SEG0_Pin|SEG1_Pin|SEG2_Pin|SEG3_Pin
-                          |SEG4_Pin|SEG5_Pin|SEG6_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, SEG0_Pin|SEG1_Pin|SEG2_Pin|MODE4_Pin
+                          |MODE5_Pin|SEG3_Pin|SEG4_Pin|SEG5_Pin
+                          |SEG6_Pin|MODE1_Pin|MODE2_Pin|MODE3_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : DOT_Pin LED_RED_Pin EN0_Pin EN1_Pin
                            EN2_Pin EN3_Pin EN4_Pin EN5_Pin */
@@ -357,10 +429,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : SEG0_Pin SEG1_Pin SEG2_Pin SEG3_Pin
-                           SEG4_Pin SEG5_Pin SEG6_Pin */
-  GPIO_InitStruct.Pin = SEG0_Pin|SEG1_Pin|SEG2_Pin|SEG3_Pin
-                          |SEG4_Pin|SEG5_Pin|SEG6_Pin;
+  /*Configure GPIO pins : SEG0_Pin SEG1_Pin SEG2_Pin MODE4_Pin
+                           MODE5_Pin SEG3_Pin SEG4_Pin SEG5_Pin
+                           SEG6_Pin MODE1_Pin MODE2_Pin MODE3_Pin */
+  GPIO_InitStruct.Pin = SEG0_Pin|SEG1_Pin|SEG2_Pin|MODE4_Pin
+                          |MODE5_Pin|SEG3_Pin|SEG4_Pin|SEG5_Pin
+                          |SEG6_Pin|MODE1_Pin|MODE2_Pin|MODE3_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

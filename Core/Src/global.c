@@ -18,4 +18,5 @@ int month = 12;
 int year = 2023;
 int status = INIT;
 int MAX_HOUR = 24;
+int dmy5stime = 0;
 

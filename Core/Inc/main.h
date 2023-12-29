@@ -72,6 +72,10 @@ void Error_Handler(void);
 #define SEG1_GPIO_Port GPIOB
 #define SEG2_Pin GPIO_PIN_2
 #define SEG2_GPIO_Port GPIOB
+#define MODE4_Pin GPIO_PIN_10
+#define MODE4_GPIO_Port GPIOB
+#define MODE5_Pin GPIO_PIN_11
+#define MODE5_GPIO_Port GPIOB
 #define BUTTON1_Pin GPIO_PIN_13
 #define BUTTON1_GPIO_Port GPIOB
 #define BUTTON2_Pin GPIO_PIN_14
@@ -94,6 +98,12 @@ void Error_Handler(void);
 #define SEG5_GPIO_Port GPIOB
 #define SEG6_Pin GPIO_PIN_6
 #define SEG6_GPIO_Port GPIOB
+#define MODE1_Pin GPIO_PIN_7
+#define MODE1_GPIO_Port GPIOB
+#define MODE2_Pin GPIO_PIN_8
+#define MODE2_GPIO_Port GPIOB
+#define MODE3_Pin GPIO_PIN_9
+#define MODE3_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
