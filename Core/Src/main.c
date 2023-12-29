@@ -229,7 +229,7 @@ int main(void)
 
   SCH_Add_Task(blinkydot, 10, 500);
   SCH_Add_Task(update_time, 0, 1200);
-  SCH_Add_Task(scanLED, 0, 200);
+  SCH_Add_Task(scanLED, 10, 200);
   SCH_Add_Task(fsm_run, 0, 10);
   SCH_Add_Task(alarm, 10, 1200);
   HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);

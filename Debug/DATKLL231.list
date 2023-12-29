@@ -2330,9 +2330,9 @@ int main(void)
  800152a:	2100      	movs	r1, #0
  800152c:	480f      	ldr	r0, [pc, #60]	; (800156c <main+0x70>)
  800152e:	f000 fa27 	bl	8001980 <SCH_Add_Task>
-  SCH_Add_Task(scanLED, 0, 200);
+  SCH_Add_Task(scanLED, 10, 200);
  8001532:	22c8      	movs	r2, #200	; 0xc8
- 8001534:	2100      	movs	r1, #0
+ 8001534:	210a      	movs	r1, #10
  8001536:	480e      	ldr	r0, [pc, #56]	; (8001570 <main+0x74>)
  8001538:	f000 fa22 	bl	8001980 <SCH_Add_Task>
   SCH_Add_Task(fsm_run, 0, 10);
