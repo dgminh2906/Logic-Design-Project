@@ -7,7 +7,7 @@
 
 #include "global.h"
 
-int hour = 11;
+int hour = 12;
 int min = 59;
 int sec = 57;
 int hour_alarm = 12;

@@ -85,12 +85,32 @@ void update7SEG(int index){
 }
 
 void updateLedBufferMode1(){
-	led_buffer[0] = (hour % MAX_HOUR) / 10;
-	led_buffer[1] = (hour % MAX_HOUR) % 10;
-	led_buffer[2] = min / 10;
-	led_buffer[3] = min % 10;
-	led_buffer[4] = sec / 10;
-	led_buffer[5] = sec % 10;
+	if (MAX_HOUR == 24)
+	{
+		led_buffer[0] = (hour % MAX_HOUR) / 10;
+		led_buffer[1] = (hour % MAX_HOUR) % 10;
+		led_buffer[2] = min / 10;
+		led_buffer[3] = min % 10;
+		led_buffer[4] = sec / 10;
+		led_buffer[5] = sec % 10;
+	}
+	if (MAX_HOUR == 12)
+	{
+		if (hour > 12)
+		{
+			led_buffer[0] = (hour % MAX_HOUR) / 10;
+			led_buffer[1] = (hour % MAX_HOUR) % 10;
+		}
+		else{
+			led_buffer[0] = hour / 10;
+			led_buffer[1] = hour % 10;
+		}
+		led_buffer[2] = min / 10;
+		led_buffer[3] = min % 10;
+		led_buffer[4] = sec / 10;
+		led_buffer[5] = sec % 10;
+
+	}
 }
 
 void updateLedBufferMode2(){
@@ -103,12 +123,30 @@ void updateLedBufferMode2(){
 }
 
 void updateLedBufferMode4(){
-	led_buffer[0] = (hour_alarm % MAX_HOUR) / 10;
-	led_buffer[1] = (hour_alarm % MAX_HOUR) % 10;
-	led_buffer[2] = min_alarm / 10;
-	led_buffer[3] = min_alarm % 10;
-	led_buffer[4] = sec_alarm / 10;
-	led_buffer[5] = sec_alarm % 10;
+	if (MAX_HOUR == 24){
+		led_buffer[0] = (hour_alarm % MAX_HOUR) / 10;
+		led_buffer[1] = (hour_alarm % MAX_HOUR) % 10;
+		led_buffer[2] = min_alarm / 10;
+		led_buffer[3] = min_alarm % 10;
+		led_buffer[4] = sec_alarm / 10;
+		led_buffer[5] = sec_alarm % 10;
+	}
+	if (MAX_HOUR == 12){
+		if (hour_alarm > 12){
+			led_buffer[0] = (hour_alarm % MAX_HOUR) / 10;
+			led_buffer[1] = (hour_alarm % MAX_HOUR) % 10;
+		}
+		else{
+			led_buffer[0] = hour_alarm / 10;
+			led_buffer[1] = hour_alarm % 10;
+		}
+		led_buffer[2] = min_alarm / 10;
+		led_buffer[3] = min_alarm % 10;
+		led_buffer[4] = sec_alarm / 10;
+		led_buffer[5] = sec_alarm % 10;
+
+	}
+
 }
 
 
